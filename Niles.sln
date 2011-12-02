@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Niles", "Niles\Niles.csproj", "{91BF9C32-9ED3-4EE3-B736-D9B5B458F59A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Niles.Test", "Niles.Test\Niles.Test.csproj", "{71636A40-9047-4F72-8932-032AC829A0DB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91BF9C32-9ED3-4EE3-B736-D9B5B458F59A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91BF9C32-9ED3-4EE3-B736-D9B5B458F59A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91BF9C32-9ED3-4EE3-B736-D9B5B458F59A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91BF9C32-9ED3-4EE3-B736-D9B5B458F59A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71636A40-9047-4F72-8932-032AC829A0DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71636A40-9047-4F72-8932-032AC829A0DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71636A40-9047-4F72-8932-032AC829A0DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71636A40-9047-4F72-8932-032AC829A0DB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
