@@ -1,0 +1,22 @@
+﻿{
+  "name":"alfred.automation",
+  "builds":[
+    {
+      "number":29,
+      "timestamp":1322892186041
+    },
+    {
+      "number":28,
+      "timestamp":1322805783960
+    },
+    {
+      "number":27,
+      "timestamp":1322719378380
+    },
+    {
+      "number":26,
+      "timestamp":1322546581433
+    }
+  ],
+  "color":"red"
+}

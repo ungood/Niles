@@ -1,0 +1,111 @@
+﻿{
+   "actions":[
+      {
+         "parameterDefinitions":[
+            {
+               "defaultParameterValue":{
+                  "value":"develop"
+               },
+               "description":"Select the branch to build from.",
+               "name":"BRANCH",
+               "type":"StringParameterDefinition"
+            }
+         ]
+      },
+      {
+
+      },
+      {
+
+      }
+   ],
+   "description":"Build the Alfred application in the automation environment. ",
+   "displayName":"alfred.automation",
+   "name":"alfred.automation",
+   "url":"mock://test/job/alfred.automation/",
+   "buildable":true,
+   "builds":[
+      {
+         "number":29,
+         "url":"mock://test:8080/job/alfred.automation/29/"
+      },
+      {
+         "number":28,
+         "url":"mock://test:8080/job/alfred.automation/28/"
+      },
+      {
+         "number":27,
+         "url":"mock://test:8080/job/alfred.automation/27/"
+      },
+      {
+         "number":26,
+         "url":"mock://test:8080/job/alfred.automation/26/"
+      }
+   ],
+   "color":"red",
+   "firstBuild":{
+      "number":26,
+      "url":"mock://test:8080/job/alfred.automation/26/"
+   },
+   "healthReport":[
+      {
+         "description":"Build stability: 3 out of the last 4 builds failed.",
+         "iconUrl":"health-20to39.png",
+         "score":25
+      }
+   ],
+   "inQueue":false,
+   "keepDependencies":false,
+   "lastBuild":{
+      "number":29,
+      "url":"mock://test:8080/job/alfred.automation/29/"
+   },
+   "lastCompletedBuild":{
+      "number":29,
+      "url":"mock://test:8080/job/alfred.automation/29/"
+   },
+   "lastFailedBuild":{
+      "number":29,
+      "url":"mock://test:8080/job/alfred.automation/29/"
+   },
+   "lastStableBuild":{
+      "number":26,
+      "url":"mock://test:8080/job/alfred.automation/26/"
+   },
+   "lastSuccessfulBuild":{
+      "number":26,
+      "url":"mock://test:8080/job/alfred.automation/26/"
+   },
+   "lastUnstableBuild":null,
+   "lastUnsuccessfulBuild":{
+      "number":29,
+      "url":"mock://test:8080/job/alfred.automation/29/"
+   },
+   "nextBuildNumber":30,
+   "property":[
+      {
+         "parameterDefinitions":[
+            {
+               "defaultParameterValue":{
+                  "name":"BRANCH",
+                  "value":"develop"
+               },
+               "description":"Select the branch to build from.",
+               "name":"BRANCH",
+               "type":"StringParameterDefinition"
+            }
+         ]
+      }
+   ],
+   "queueItem":null,
+   "concurrentBuild":false,
+   "downstreamProjects":[
+
+   ],
+   "scm":{
+
+   },
+   "upstreamProjects":[
+
+   ]
+}

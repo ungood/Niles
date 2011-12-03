@@ -1,0 +1,64 @@
+﻿{
+  "assignedLabels":[
+    {
+
+    }
+  ],
+  "mode":"NORMAL",
+  "nodeDescription":"the master Jenkins node",
+  "nodeName":"",
+  "numExecutors":6,
+  "description":"Example Build System",
+  "jobs":[
+    {
+      "name":"alfred.automation",
+      "url":"mock://test:8080/job/alfred.automation/",
+      "color":"red"
+    },
+    {
+      "name":"alfred.binarypromotion.branch",
+      "url":"mock://test:8080/job/alfred.binarypromotion.branch/",
+      "color":"disabled"
+    },
+    {
+      "name":"operations.alfred.ci",
+      "url":"mock://test:8080/job/operations.alfred.ci/",
+      "color":"blue"
+    },
+    {
+      "name":"operations.alfred.deploy",
+      "url":"mock://test:8080/job/operations.alfred.deploy/",
+      "color":"blue"
+    },
+    {
+      "name":"operations.alfred.qa",
+      "url":"mock://test:8080/job/operations.alfred.qa/",
+      "color":"blue"
+    }
+  ],
+  "overallLoad":{
+
+  },
+  "primaryView":{
+    "name":"All",
+    "url":"mock://test:8080/"
+  },
+  "quietingDown":false,
+  "slaveAgentPort":0,
+  "useCrumbs":false,
+  "useSecurity":true,
+  "views":[
+    {
+      "name":"All",
+      "url":"mock://test:8080/"
+    },
+    {
+      "name":"badabing",
+      "url":"mock://test:8080/view/badabing/"
+    },
+    {
+      "name":"operations",
+      "url":"mock://test:8080/view/operations/"
+    }
+  ]
+}

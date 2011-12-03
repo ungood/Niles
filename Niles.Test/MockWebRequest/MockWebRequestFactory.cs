@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 
 namespace Niles.Test.MockWebRequest
@@ -19,12 +20,20 @@ namespace Niles.Test.MockWebRequest
 
         public void Expect(Uri uri, MockWebResponse response)
         {
-            responses.Add(uri, response);
+            responses[uri] = response;
         }
 
         public void Expect(Uri uri, string response)
         {
             Expect(uri, new MockWebResponse(response));
+        }
+
+        public void Expect(Uri uri, Stream responseStream)
+        {
+            using(var streamReader = new StreamReader(responseStream))
+            {
+                Expect(uri, streamReader.ReadToEnd());
+            }
         }
 
         public WebRequest Create(Uri uri)

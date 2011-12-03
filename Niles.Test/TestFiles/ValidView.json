@@ -1,0 +1,25 @@
+﻿{
+   "description":"Operations make things operate.",
+   "jobs":[
+      {
+         "name":"operations.alfred.ci",
+         "url":"mock://test:8080/job/operations.alfred.ci/",
+         "color":"blue"
+      },
+      {
+         "name":"operations.alfred.deploy",
+         "url":"mock://test:8080/job/operations.alfred.deploy/",
+         "color":"blue"
+      },
+      {
+         "name":"operations.alfred.qa",
+         "url":"mock://test:8080/job/operations.alfred.qa/",
+         "color":"blue"
+      }
+   ],
+   "name":"operations",
+   "property":[
+
+   ],
+   "url":"mock://test:8080/view/operations/"
+}

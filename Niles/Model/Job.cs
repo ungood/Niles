@@ -35,6 +35,7 @@ namespace Niles.Model
         public bool InQueue { get; set; }
         public bool KeepDependencies { get; set; }
 
+        public Build FirstBuild { get; set; }
         public Build LastBuild { get; set; }
         public Build LastCompletedBuild { get; set; }
         public Build LastFailedBuild { get; set; }
@@ -48,11 +49,7 @@ namespace Niles.Model
         public IList<Job> DownstreamProjects { get; set; }
         public IList<Job> UpstreamProjects { get; set; }
 
-        // Items I'm not sure about yet
-        // actions
-        // property
-        // queueItem
-        // scm
+        // TODO: actions, property, queueItem, scm
 
         public Job()
         {

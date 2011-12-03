@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Niles.Json;
 
 namespace Niles.Model
 {
@@ -38,7 +39,7 @@ namespace Niles.Model
         public string Result { get; set; }
         public string BuiltOn { get; set; }
 
-        [JsonConverter(typeof(UnixDateTimeConverter))]
+        [JsonConverter(typeof(BuildTimestampConverter))]
         public DateTime Timestamp { get; set; }
 
         public IList<Artifact> Artifacts { get; set; }

@@ -36,9 +36,7 @@ namespace Niles.Model
         public bool UseCrumbs { get; set; }
         public bool UseSecurity { get; set; }
 
-        // Items I'm not sure about
-        // assignedLabels
-        // overallLoad
+        // TODO: assignedLabels, overallLoad
 
         public Node()
         {
