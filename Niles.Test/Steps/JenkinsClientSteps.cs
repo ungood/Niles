@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using Newtonsoft.Json;
 using Niles.Model;
 using Niles.Test.MockWebRequest;
 using TechTalk.SpecFlow;
@@ -45,7 +46,7 @@ namespace Niles.Test.Steps
         [When(@"I get the hudson element")]
         public void WhenIGetTheHudsonElement()
         {
-            Client.GetRoot();
+            //Client.GetRoot();
         }
 
     }

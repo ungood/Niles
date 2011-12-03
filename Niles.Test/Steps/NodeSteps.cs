@@ -20,7 +20,7 @@ namespace Niles.Test.Steps
         [Given(@"a node named (.*)")]
         public void GivenANodeNamedTest(string name)
         {
-            Node.Name = name;
+            //Node.Name = name;
         }
     }
 }

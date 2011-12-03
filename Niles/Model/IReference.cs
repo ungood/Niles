@@ -16,25 +16,11 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 
 namespace Niles.Model
 {
-    public class ViewReference : IReference<View>
+    public interface IReference<T>
     {
-        public string Name { get; set; }
-        public Uri Url { get; set; }
-    }
-
-    public class View
-    {
-        public string Name { get; set; }
-        public Uri Url { get; set; }
-        public string Description { get; set; }
-        public IList<JobReference> Jobs { get; set; } 
-
-        // Not sure:
-        // property
-
+        Uri Url { get; }
     }
 }
