@@ -14,19 +14,22 @@
     <MSBuildExtensions>$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.dll</MSBuildExtensions>
     <AssemblyInfoTask>$(MSBuildExtensionsPath)\Microsoft\AssemblyInfoTask\Microsoft.VersionNumber.targets</AssemblyInfoTask>
     <NugetPath>$(ToolsDir)\nuget.exe</NugetPath>
+    <NUnitPath>$(ToolsDir)\NUnit-2.5.10.11092\bin\net-2.0</NUnitPath>
   </PropertyGroup>
 
 	<ItemGroup>
-    <AssemblyInfoFiles Include="**\AssemblyInfo.*" />
+    <AssemblyInfoFiles Include="**\AssemblyInfo.cs" />
     <IntermediateAssembly Include="$(OutputDir)\Niles.dll"/>
   </ItemGroup>
 
   <ItemGroup>
     <MainAssemblies Include="$(OutputDir)\Niles.dll" />
+    <TestAssemblies Include="$(SolutionDir)\Niles.Test\bin\$(Configuration)\Niles.Test.dll" />
   </ItemGroup>
 
   <Import Project="$(AssemblyInfoTask)" />
   <UsingTask AssemblyFile="$(MSBuildExtensions)" TaskName="MSBuild.Community.Tasks.XmlUpdate" />
+  <UsingTask AssemblyFile="$(MSBuildExtensions)" TaskName="MSBuild.Community.Tasks.NUnit" />
 
   <PropertyGroup>
     <AssemblyCopyright>Copyright 2011 Jason Walker</AssemblyCopyright>
@@ -41,7 +44,14 @@
     <MSBuild Projects="$(SolutionFile)" Targets="Rebuild" Properties="Configuration=$(Configuration)"  />
   </Target>
 
-  <Target Name="BuildPackage" DependsOnTargets="Compile">
+  <Target Name="Test" DependsOnTargets="Compile">
+    <NUnit Assemblies="@(TestAssemblies)"
+           WorkingDirectory="$(SolutionDir)"
+           ToolPath="$(NUnitPath)"
+           ContinueOnError="False" />
+  </Target>
+
+  <Target Name="BuildPackage" DependsOnTargets="Test">
     <!-- First copy the nuspec template files to the package dir -->
     <Copy SourceFiles="$(SolutionDir)\$(ProjectName).nuspec" DestinationFolder="$(BuildDir)" />
 

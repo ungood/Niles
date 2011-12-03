@@ -17,7 +17,6 @@ namespace Niles.Monitor
         }
 
         public event EventHandler<PollingErrorEventArgs> OnPollingError;
-        public event EventHandler<EventArgs> On 
         // Events I care about:
         // * Polling error
         // * New job
