@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Niles</id>
+    <version></version>
+    <authors>Jason Walker</authors>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>http://github.com/ungood/niles</projectUrl>
+    <iconUrl>http://download.codeplex.com/Project/Download/FileDownload.aspx?ProjectName=FluentValidation&amp;DownloadId=166226</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>...description goes here...</description>
+    <summary>...summary goes here...</summary>
+    <language>en-US</language>
+  </metadata>
+</package>
