@@ -72,7 +72,7 @@ namespace Niles.Model
 
     public class ChangeSetItem
     {
-        public UserResource Author { get; set; }
+        public User Author { get; set; }
         public string Comment { get; set; }
         public string Id { get; set; }
         

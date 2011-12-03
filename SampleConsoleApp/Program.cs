@@ -16,8 +16,10 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Reflection;
 using Niles;
+using Niles.Model;
 
 namespace SampleConsoleApp
 {
@@ -27,38 +29,8 @@ namespace SampleConsoleApp
 
         static void Main(string[] args)
         {
-            WorkaroundTrailingPeriodBug();
-
-            var client = new JenkinsClient(BaseUri);
-
-            var node = client.GetNode();
-            Console.WriteLine(node.Description);
-
-            foreach(var jobRef in node.Jobs)
-            {
-                var job = client.GetResource(jobRef);
-                Console.WriteLine("  Job: " + job.Name);
-            }
         }
 
-        private static void WorkaroundTrailingPeriodBug()
-        {
-            var getSyntax = typeof(UriParser).GetMethod("GetSyntax", BindingFlags.Static | BindingFlags.NonPublic);
-            var flagsField = typeof(UriParser).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (getSyntax != null && flagsField != null)
-            {
-                foreach (var scheme in new[] { "http", "https" })
-                {
-                    var parser = (UriParser)getSyntax.Invoke(null, new object[] { scheme });
-                    if (parser != null)
-                    {
-                        var flagsValue = (int) flagsField.GetValue(parser);
-                        // Clear the CanonicalizeAsFilePath attribute
-                        if ((flagsValue & 0x1000000) != 0)
-                            flagsField.SetValue(parser, flagsValue & ~0x1000000);
-                    }
-                }
-            }
-        }
+        
     }
 }

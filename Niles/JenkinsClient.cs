@@ -38,39 +38,39 @@ namespace Niles
             WorkaroundTrailingPeriodBug();
         }
 
-        public TResource GetResource<TResource>(Uri resourceUri, string tree = null)
+        public T GeT<T>(Uri resourceUri, string tree = null)
         {
             var relativeUri = ApiSuffix;
             if(!string.IsNullOrWhiteSpace(tree))
                 relativeUri += "?tree=" + tree;
 
             var absoluteUri = new Uri(resourceUri, relativeUri);
-            return GetResourceInternal<TResource>(absoluteUri);
+            return GeTInternal<T>(absoluteUri);
         }
 
-        public TResource GetResource<TResource>(Uri resourceUri, int depth)
+        public T GeT<T>(Uri resourceUri, int depth)
         {
             var relativeUri = ApiSuffix;
             if(depth > 0)
                 relativeUri += "?depth=" + depth;
 
             var absoluteUri = new Uri(resourceUri, relativeUri);
-            return GetResourceInternal<TResource>(absoluteUri);
+            return GeTInternal<T>(absoluteUri);
         }
 
-        public TResource Expand<TResource>(TResource resource, string tree = null)
-            where TResource : IResource
+        public T Expand<T>(T resource, string tree = null)
+            where T : IResource
         {
-            return GetResource<TResource>(resource.Url, tree);
+            return GeT<T>(resource.Url, tree);
         }
 
-        public TResource Expand<TResource>(TResource resource, int depth)
-            where TResource : IResource
+        public T Expand<T>(T resource, int depth)
+            where T : IResource
         {
-            return GetResource<TResource>(resource.Url, depth);
+            return GeT<T>(resource.Url, depth);
         }
 
-        private T GetResourceInternal<T>(Uri absoluteUri)
+        private T GeTInternal<T>(Uri absoluteUri)
         {
             var request = WebRequest.Create(absoluteUri);
             try
