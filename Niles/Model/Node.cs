@@ -16,7 +16,6 @@
 #endregion
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Niles.Model
 {
@@ -26,11 +25,11 @@ namespace Niles.Model
         public string NodeDescription { get; set; }
         public string Description { get; set; }
 
-        public IList<JobReference> Jobs { get; set; }
-        public IList<ViewReference> Views { get; set; }
+        public IList<Job> Jobs { get; set; }
+        public IList<View> Views { get; set; }
         public string Mode { get; set; }
         public int NumExecutors { get; set; }
-        public ViewReference PrimaryView { get; set; }
+        public View PrimaryView { get; set; }
 
         public bool QuietingDown { get; set; }
         public int SlaveAgentPort { get; set; }
@@ -43,8 +42,8 @@ namespace Niles.Model
 
         public Node()
         {
-            Jobs = new List<JobReference>();
-            Views = new List<ViewReference>();
+            Jobs = new List<Job>();
+            Views = new List<View>();
         }
     }
 }

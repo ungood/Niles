@@ -21,14 +21,7 @@ using Newtonsoft.Json;
 
 namespace Niles.Model
 {
-    public class JobReference : IReference<Job>
-    {
-        public string Name { get; set; }
-        public Uri Url { get; set; }
-        public string Color { get; set; }
-    }
-
-    public class Job
+    public class Job : IResource
     {
         public string Name { get; set; }
         public Uri Url { get; set; }
@@ -36,24 +29,24 @@ namespace Niles.Model
         public string Description { get; set; }
         public string DisplayName { get; set; }
         public bool Buildable { get; set; }
-        public IList<BuildReference> Builds { get; set; }
+        public IList<Build> Builds { get; set; }
         [JsonProperty("healthReport")]
         public IList<HealthReport> HealthReports { get; set; }
         public bool InQueue { get; set; }
         public bool KeepDependencies { get; set; }
 
-        public BuildReference LastBuild { get; set; }
-        public BuildReference LastCompletedBuild { get; set; }
-        public BuildReference LastFailedBuild { get; set; }
-        public BuildReference LastStableBuild { get; set; }
-        public BuildReference LastSuccessfulBuild { get; set; }
-        public BuildReference LastUnstableBuild { get; set; }
-        public BuildReference LastUnsuccessfulBuild { get; set; }
+        public Build LastBuild { get; set; }
+        public Build LastCompletedBuild { get; set; }
+        public Build LastFailedBuild { get; set; }
+        public Build LastStableBuild { get; set; }
+        public Build LastSuccessfulBuild { get; set; }
+        public Build LastUnstableBuild { get; set; }
+        public Build LastUnsuccessfulBuild { get; set; }
 
         public int NextBuildNumber { get; set; }
         public bool ConcurrentBuild { get; set; }
-        public IList<JobReference> DownstreamProjects { get; set; }
-        public IList<JobReference> UpstreamProjects { get; set; }
+        public IList<Job> DownstreamProjects { get; set; }
+        public IList<Job> UpstreamProjects { get; set; }
 
         // Items I'm not sure about yet
         // actions
@@ -63,9 +56,9 @@ namespace Niles.Model
 
         public Job()
         {
-            Builds = new List<BuildReference>();
-            DownstreamProjects = new List<JobReference>();
-            UpstreamProjects = new List<JobReference>();
+            Builds = new List<Build>();
+            DownstreamProjects = new List<Job>();
+            UpstreamProjects = new List<Job>();
             HealthReports = new List<HealthReport>();
         }
     }

@@ -17,8 +17,8 @@
 
 using System;
 using System.Net;
-using Common.Logging;
-using Common.Logging.Simple;
+using System.Reflection;
+using Newtonsoft.Json;
 using Niles.Model;
 
 namespace Niles
@@ -28,27 +28,51 @@ namespace Niles
     /// </summary>
     public class JenkinsClient
     {
-        private readonly Uri baseUri;
-        private readonly ILog log;
+        public const string ApiSuffix = "api/json";
+
         private readonly JenkinsSerializer serializer;
 
-        public JenkinsClient(Uri baseUri, ILog log)
+        public JenkinsClient()
         {
-            this.baseUri = baseUri;
-            this.log = log ?? new NoOpLogger();
             serializer = new JenkinsSerializer();
+            WorkaroundTrailingPeriodBug();
         }
 
-        public JenkinsClient(Uri baseUri) : this(baseUri, null)
+        public TResource GetResource<TResource>(Uri resourceUri, string tree = null)
         {
+            var relativeUri = ApiSuffix;
+            if(!string.IsNullOrWhiteSpace(tree))
+                relativeUri += "?tree=" + tree;
+
+            var absoluteUri = new Uri(resourceUri, relativeUri);
+            return GetResourceInternal<TResource>(absoluteUri);
         }
 
-        private T ReadObject<T>(Uri resourceUri)
+        public TResource GetResource<TResource>(Uri resourceUri, int depth)
         {
-            var uri = new Uri(resourceUri, "api/json");
-            log.Debug("Polling Jenkins at " + uri);
+            var relativeUri = ApiSuffix;
+            if(depth > 0)
+                relativeUri += "?depth=" + depth;
 
-            var request = WebRequest.Create(uri);
+            var absoluteUri = new Uri(resourceUri, relativeUri);
+            return GetResourceInternal<TResource>(absoluteUri);
+        }
+
+        public TResource Expand<TResource>(TResource resource, string tree = null)
+            where TResource : IResource
+        {
+            return GetResource<TResource>(resource.Url, tree);
+        }
+
+        public TResource Expand<TResource>(TResource resource, int depth)
+            where TResource : IResource
+        {
+            return GetResource<TResource>(resource.Url, depth);
+        }
+
+        private T GetResourceInternal<T>(Uri absoluteUri)
+        {
+            var request = WebRequest.Create(absoluteUri);
             try
             {
                 var response = request.GetResponse();
@@ -61,19 +85,41 @@ namespace Niles
             }
             catch (WebException ex)
             {
-                log.Warn("Could not access " + uri, ex);
-                throw;
+                throw new JenkinsClientException("Could not access resource at: " + absoluteUri, ex);
+            }
+            catch (JsonSerializationException ex)
+            {
+                throw new JenkinsClientException("Resource at " + absoluteUri + " could not be deserialized", ex);
             }
         }
 
-        public Node GetNode()
+        /// <summary>
+        /// There is a bug in .NET versions 4.0 and lower that does not correctly 
+        /// parse URIs with a trailing period in a path.  Jenkins will sometimes
+        /// generate URIs with a trailing period (when a job or build name is
+        /// written like a sentence, for example).  This workaround resolves
+        /// the issue.
+        /// 
+        /// See: https://connect.microsoft.com/VisualStudio/feedback/details/386695/system-uri-incorrectly-strips-trailing-dots#tabs
+        /// </summary>
+        private static void WorkaroundTrailingPeriodBug()
         {
-            return ReadObject<Node>(baseUri);
-        }
-
-        public T GetResource<T>(IReference<T> reference)
-        {
-            return ReadObject<T>(reference.Url);
+            var getSyntax = typeof(UriParser).GetMethod("GetSyntax", BindingFlags.Static | BindingFlags.NonPublic);
+            var flagsField = typeof(UriParser).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (getSyntax != null && flagsField != null)
+            {
+                foreach (var scheme in new[] { "http", "https" })
+                {
+                    var parser = (UriParser)getSyntax.Invoke(null, new object[] { scheme });
+                    if (parser != null)
+                    {
+                        var flagsValue = (int) flagsField.GetValue(parser);
+                        // Clear the CanonicalizeAsFilePath attribute
+                        if ((flagsValue & 0x1000000) != 0)
+                            flagsField.SetValue(parser, flagsValue & ~0x1000000);
+                    }
+                }
+            }
         }
     }
 }

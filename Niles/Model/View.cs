@@ -20,18 +20,12 @@ using System.Collections.Generic;
 
 namespace Niles.Model
 {
-    public class ViewReference : IReference<View>
-    {
-        public string Name { get; set; }
-        public Uri Url { get; set; }
-    }
-
-    public class View
+    public class View : IResource
     {
         public string Name { get; set; }
         public Uri Url { get; set; }
         public string Description { get; set; }
-        public IList<JobReference> Jobs { get; set; } 
+        public IList<Job> Jobs { get; set; } 
 
         // Not sure:
         // property

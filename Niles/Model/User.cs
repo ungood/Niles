@@ -3,15 +3,7 @@ using Newtonsoft.Json;
 
 namespace Niles.Model
 {
-    public class UserReference : IReference<User>
-    {
-        [JsonProperty("absoluteUrl")]
-        public Uri Url { get; set; }
-
-        public string FullName { get; set; }
-    }
-
-    public class User
+    public class User : IResource
     {
         [JsonProperty("absoluteUrl")]
         public Uri Url { get; set; }

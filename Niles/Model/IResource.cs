@@ -19,7 +19,7 @@ using System;
 
 namespace Niles.Model
 {
-    public interface IReference<T>
+    public interface IResource
     {
         Uri Url { get; }
     }

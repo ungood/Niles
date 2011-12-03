@@ -22,13 +22,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Niles.Model
 {
-    public class BuildReference : IReference<Build>
-    {
-        public int Number { get; set; }
-        public Uri Url { get; set; }
-    }
-
-    public class Build
+    public class Build : IResource
     {
         public int Number { get; set; }
         public Uri Url { get; set; }
@@ -50,11 +44,11 @@ namespace Niles.Model
         public IList<Artifact> Artifacts { get; set; }
 
         public ChangeSet ChangeSet { get; set; }
-        public IList<UserReference> Culprits { get; set; }
+        public IList<User> Culprits { get; set; }
 
         public Build()
         {
-            Culprits = new List<UserReference>();
+            Culprits = new List<User>();
         }
     }
 
@@ -78,7 +72,7 @@ namespace Niles.Model
 
     public class ChangeSetItem
     {
-        public UserReference Author { get; set; }
+        public UserResource Author { get; set; }
         public string Comment { get; set; }
         public string Id { get; set; }
         
