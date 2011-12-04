@@ -58,6 +58,11 @@ namespace Niles.Model
             UpstreamProjects = new List<Job>();
             HealthReports = new List<HealthReport>();
         }
+
+        public override string ToString()
+        {
+            return DisplayName ?? Name;
+        }
     }
 
     public class HealthReport

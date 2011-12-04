@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AsyncCtpLibrary">
+      <HintPath>..\packages\AsyncCtp\AsyncCtpLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -51,8 +54,11 @@
     <Compile Include="Model\User.cs" />
     <Compile Include="Model\View.cs" />
     <Compile Include="Monitor\IJobStateStore.cs" />
+    <Compile Include="Monitor\IMonitorConfig.cs" />
     <Compile Include="Monitor\JenkinsMonitor.cs" />
     <Compile Include="Monitor\EventArgs.cs" />
+    <Compile Include="Monitor\JobState.cs" />
+    <Compile Include="Monitor\MemoryJobStateStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Json\BuildTimestampConverter.cs" />
   </ItemGroup>

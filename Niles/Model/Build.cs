@@ -51,6 +51,11 @@ namespace Niles.Model
         {
             Culprits = new List<User>();
         }
+
+        public override string ToString()
+        {
+            return FullDisplayName ?? Number.ToString();
+        }
     }
 
     public class Artifact

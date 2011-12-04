@@ -17,6 +17,7 @@
 
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Niles.Model;
 
 namespace Niles.Client
@@ -24,7 +25,7 @@ namespace Niles.Client
     public abstract class JenkinsClientBase : IJenkinsClient
     {
         protected abstract string ApiSuffix { get; }
-        protected abstract T GetResourceInternal<T>(Uri absoluteUri);
+        protected abstract Task<T> GetResourceInternal<T>(Uri absoluteUri);
 
         protected JenkinsClientBase()
         {
@@ -39,15 +40,15 @@ namespace Niles.Client
         /// <param name="tree">
         /// A tree parameter, which will filter what properties are selected. See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>The resource, deserialized from JSON.</returns>
-        public T GetResource<T>(Uri resourceUri, string tree = null)
+        /// <returns>A task that will return resource, deserialized from JSON.</returns>
+        public async Task<T> GetResourceAsync<T>(Uri resourceUri, string tree = null)
         {
             var relativeUri = ApiSuffix;
             if(!string.IsNullOrWhiteSpace(tree))
                 relativeUri += "?tree=" + tree;
 
             var absoluteUri = new Uri(resourceUri, relativeUri);
-            return GetResourceInternal<T>(absoluteUri);
+            return await GetResourceInternal<T>(absoluteUri);
         }
 
         /// <summary>
@@ -58,15 +59,15 @@ namespace Niles.Client
         /// <param name="depth">
         /// The number of levels to select.  See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>The resource, deserialized from JSON.</returns>
-        public T GetResource<T>(Uri resourceUri, int depth)
+        /// <returns>A task that will return resource, deserialized from JSON.</returns>
+        public async Task<T> GetResourceAsync<T>(Uri resourceUri, int depth)
         {
             var relativeUri = ApiSuffix;
             if(depth > 0)
                 relativeUri += "?depth=" + depth;
 
             var absoluteUri = new Uri(resourceUri, relativeUri);
-            return GetResourceInternal<T>(absoluteUri);
+            return await GetResourceInternal<T>(absoluteUri);
         }
 
         /// <summary>
@@ -81,11 +82,11 @@ namespace Niles.Client
         /// <param name="tree">
         /// A tree parameter, which will filter what properties are selected. See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>The resource, deserialized from JSON.</returns>
-        public T Expand<T>(T resource, string tree = null)
+        /// <returns>A task that will return resource, deserialized from JSON.</returns>
+        public async Task<T> ExpandAsync<T>(T resource, string tree = null)
             where T : IResource
         {
-            return GetResource<T>(resource.Url, tree);
+            return await GetResourceAsync<T>(resource.Url, tree);
         }
 
         /// <summary>
@@ -100,11 +101,11 @@ namespace Niles.Client
         /// <param name="depth">
         /// The number of levels to select.  See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>The resource, deserialized from JSON.</returns>
-        public T Expand<T>(T resource, int depth)
+        /// <returns>A task that will return resource, deserialized from JSON.</returns>
+        public async Task<T> ExpandAsync<T>(T resource, int depth)
             where T : IResource
         {
-            return GetResource<T>(resource.Url, depth);
+            return await GetResourceAsync<T>(resource.Url, depth);
         }
 
         /// <summary>

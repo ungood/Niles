@@ -17,6 +17,7 @@
 
 using System;
 using System.Net;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Niles.Json;
 
@@ -39,16 +40,16 @@ namespace Niles.Client
             get { return "api/json"; }
         }
 
-        protected override T GetResourceInternal<T>(Uri absoluteUri)
+        protected async override Task<T> GetResourceInternal<T>(Uri absoluteUri)
         {
             var request = WebRequest.Create(absoluteUri);
             try
             {
-                var response = request.GetResponse();
+                var response = await request.GetResponseAsync();
                 
                 using(var responseStream = response.GetResponseStream())
                 {
-                    return serializer.ReadObject<T>(responseStream);
+                   return serializer.ReadObject<T>(responseStream);
                 }
                 
             }

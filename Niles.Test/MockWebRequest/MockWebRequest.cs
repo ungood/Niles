@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using Nito.AsyncEx;
 
 namespace Niles.Test.MockWebRequest
 {
@@ -34,6 +37,21 @@ namespace Niles.Test.MockWebRequest
             if(response == null)
                 throw new WebException("Mock URI not setup: " + requestUri);
             return response;
+        }
+
+        private Task<WebResponse> GetResponseTask()
+        {
+            return Task.Factory.StartNew<WebResponse>(GetResponse);
+        }
+
+        public override IAsyncResult BeginGetResponse(AsyncCallback callback, object state)
+        {
+            return AsyncFactory<WebResponse>.ToBegin(GetResponseTask(), callback, state);
+        }
+
+        public override WebResponse EndGetResponse(IAsyncResult asyncResult)
+        {
+            return AsyncFactory<WebResponse>.ToEnd(asyncResult);
         }
     }
 }

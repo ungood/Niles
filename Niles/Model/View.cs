@@ -30,5 +30,9 @@ namespace Niles.Model
         // Not sure:
         // property
 
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

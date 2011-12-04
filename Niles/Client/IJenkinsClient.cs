@@ -16,19 +16,20 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using Niles.Model;
 
 namespace Niles.Client
 {
     public interface IJenkinsClient
     {
-        T GetResource<T>(Uri resourceUri, string tree = null);
-        T GetResource<T>(Uri resourceUri, int depth);
+        Task<T> GetResourceAsync<T>(Uri resourceUri, string tree = null);
+        Task<T> GetResourceAsync<T>(Uri resourceUri, int depth);
 
-        T Expand<T>(T resource, string tree = null)
+        Task<T> ExpandAsync<T>(T resource, string tree = null)
             where T : IResource;
 
-        T Expand<T>(T resource, int depth)
+        Task<T> ExpandAsync<T>(T resource, int depth)
             where T : IResource;
     }
 }
