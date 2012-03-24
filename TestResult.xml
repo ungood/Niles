@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="c:\projects\Niles\Niles.Test\bin\Release\Niles.Test.dll" total="7" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2012-03-24" time="01:26:39">
+  <environment nunit-version="2.5.10.11092" clr-version="2.0.50727.5448" os-version="Microsoft Windows NT 6.1.7601 Service Pack 1" platform="Win32NT" cwd="c:\projects\Niles" machine-name="JWALKER007" user="jason.walker" user-domain="BODY" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="Assembly" name="c:\projects\Niles\Niles.Test\bin\Release\Niles.Test.dll" executed="True" result="Success" success="True" time="0.998" asserts="0">
+    <results>
+      <test-suite type="Namespace" name="Niles" executed="True" result="Success" success="True" time="0.998" asserts="0">
+        <results>
+          <test-suite type="Namespace" name="Test" executed="True" result="Success" success="True" time="0.998" asserts="0">
+            <results>
+              <test-suite type="Namespace" name="JsonClient" executed="True" result="Success" success="True" time="0.998" asserts="0">
+                <results>
+                  <test-suite type="TestFixture" name="JobTests" executed="True" result="Success" success="True" time="0.593" asserts="0">
+                    <results>
+                      <test-case name="Niles.Test.JsonClient.JobTests.Can_Expand_Valid_Job_Resource" executed="True" result="Success" success="True" time="0.562" asserts="28" />
+                      <test-case name="Niles.Test.JsonClient.JobTests.Can_Get_Job_Resource_With_Tree" executed="True" result="Success" success="True" time="0.016" asserts="6" />
+                      <test-case name="Niles.Test.JsonClient.JobTests.Can_Get_Valid_Job_Resource" executed="True" result="Success" success="True" time="0.000" asserts="28" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="NodeTests" executed="True" result="Success" success="True" time="0.390" asserts="0">
+                    <results>
+                      <test-case name="Niles.Test.JsonClient.NodeTests.Can_Get_Valid_Node_Resource" executed="True" result="Success" success="True" time="0.016" asserts="18" />
+                      <test-case name="Niles.Test.JsonClient.NodeTests.Throws_JenkinsClientException_When_Accessing_InvalidResource" executed="True" result="Success" success="True" time="0.016" asserts="1" />
+                      <test-case name="Niles.Test.JsonClient.NodeTests.Throws_JenkinsClientException_When_Accessing_NonExistingResource" executed="True" result="Success" success="True" time="0.359" asserts="1" />
+                    </results>
+                  </test-suite>
+                  <test-suite type="TestFixture" name="ViewTests" executed="True" result="Success" success="True" time="0.016" asserts="0">
+                    <results>
+                      <test-case name="Niles.Test.JsonClient.ViewTests.Can_Get_Valid_View_Resource" executed="True" result="Success" success="True" time="0.016" asserts="8" />
+                    </results>
+                  </test-suite>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

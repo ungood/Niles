@@ -23,42 +23,46 @@ using System.Threading;
 using Niles;
 using Niles.Model;
 using Niles.Monitor;
+using Nito.AsyncEx;
 
 namespace SampleConsoleApp
 {
     class Program
     {
-        public static readonly Uri BaseUri = new Uri("http://ci:8081/");
-
-        private class SimpleConfig : IMonitorConfig
-        {
-            public Uri BaseUri { get; set; }
-            public IEnumerable<IFilterConfig> Include { get; set; }
-            public IEnumerable<IFilterConfig> Exclude { get; set; }
-        }
+        public static readonly Uri BaseUri = new Uri("http://localhost:8080/");
 
         static void Main(string[] args)
         {
             Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
 
-            //var monitor = new JenkinsMonitor();
-            //var config = new SimpleConfig {
-            //    BaseUri = BaseUri
-            //};
+            var monitor = new JenkinsMonitor(BaseUri);
 
-            //monitor.Configure(config);
+            monitor.PollingError += HandlePollingError;
+            monitor.BuildStarted += (sender, e) => Log("Build Started", e);
+            monitor.BuildFinished += (sender, e) => Log("Build Finished", e);
+            monitor.BuildFailed += (sender, e) => Log("Build Failed", e);
+            monitor.BuildSucceeded += (sender, e) => Log("Build Succeeded", e);
+            monitor.FoundJob += HandleFoundJob;
+
             
-            //monitor.PollingError += HandlePollingError;
-            //monitor.FoundJob += HandleFoundJob;
+            AsyncContext.Run(async () => {
+                while(true)
+                {
+                    await monitor.PollAsync();
+                    Thread.Sleep(10000);
+                }
+            });
 
-            //while(true)
-            //{
-            //    monitor.Poll();
-            //    Thread.Sleep(5000);
-            //}
         }
 
-        private static void HandleFoundJob(object sender, JobEventArgs e)
+        private static void Log(string eventName, BuildEventArgs e)
+        {
+            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(eventName + ":" + e.Job + " " + e.Build + " " + e.StatusChanged);
+        }
+
+        private static void HandleFoundJob(object sender, JobFoundEventArgs e)
         {
             Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
             Console.ForegroundColor = ConsoleColor.White;
@@ -67,10 +71,7 @@ namespace SampleConsoleApp
 
         static void HandlePollingError(object sender, PollingErrorEventArgs e)
         {
-            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
-            throw e.Exception;
+            Console.WriteLine("Polling Error: " + e.Exception.Message);
         }
-
-        
     }
 }

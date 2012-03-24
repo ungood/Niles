@@ -1,162 +1,154 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading;
-//using System.Threading.Tasks;
-//using Niles.Client;
-//using Niles.Model;
+﻿#region License
+// Copyright 2011 Jason Walker
+// ungood@onetrue.name
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); 
+// you may not use this file except in compliance with the License. 
+// You may obtain a copy of the License at 
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, 
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and 
+// limitations under the License.
+#endregion
 
-//namespace Niles.Monitor
-//{
-//    /// <summary>
-//    /// Polls a jenkins node and raises events when jobs or builds change states.
-//    /// </summary>
-//    public class JenkinsMonitor
-//    {
-//        private readonly SynchronizationContext eventContext;
-//        private readonly IJenkinsClient client;
-//        private readonly IJobStateStore store;
-//        private readonly TaskScheduler scheduler;
+using System;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading.Tasks;
+using Niles.Client;
+using Niles.Model;
 
-//        private readonly object pollLock = new object();
+namespace Niles.Monitor
+{
+    /// <summary>
+    /// Polls a jenkins node and raises events when jobs or builds change states.
+    /// </summary>
+    public class JenkinsMonitor
+    {
+        private readonly ConcurrentDictionary<Uri, Build> lastSeenBuilds
+            = new ConcurrentDictionary<Uri, Build>();
+        private readonly IJenkinsClient client;
+
+        private readonly object pollLock = new object();
+
+        public Uri BaseUri { get; private set; }
+
+        public JenkinsMonitor(Uri baseUri, IJenkinsClient client = null)
+        {
+            if(baseUri == null)
+                throw new ArgumentNullException("baseUri");
+
+            BaseUri = baseUri;
+            this.client = client ?? new JsonJenkinsClient();
+        }
+
+        public event EventHandler<PollingErrorEventArgs> PollingError = delegate { };
+        public event EventHandler<JobFoundEventArgs> FoundJob = delegate { };
+        public event EventHandler<BuildEventArgs> BuildStarted = delegate { };
+        public event EventHandler<BuildEventArgs> BuildFinished = delegate { };
+        public event EventHandler<BuildEventArgs> BuildFailed = delegate { };
+        public event EventHandler<BuildEventArgs> BuildSucceeded = delegate { };
+        public event EventHandler<BuildEventArgs> BuildAborted = delegate { };
+        public event EventHandler<BuildEventArgs> BuildUnstable = delegate { };
         
-//        public Uri BaseUri { get; private set; }
+        private const string TreeParameter = "jobs[name,displayName,url,lastBuild[url,number,building,result]]";
 
-//        public JenkinsMonitor(
-//            IJobStateStore store = null,
-//            IJenkinsClient client = null,
-//            TaskScheduler scheduler = null,
-//            SynchronizationContext eventContext = null)
-//        {
-//            this.store = store ?? new MemoryJobStateStore();
-//            this.client = client ?? new JsonJenkinsClient();
-//            this.scheduler = scheduler ?? TaskScheduler.Default;
-//            this.eventContext = eventContext ?? SynchronizationContext.Current;
+        /// <summary>
+        /// Polls the monitored node, and fires events based on changes in job state.
+        /// </summary>
+        public async Task PollAsync()
+        {
+            if(BaseUri == null)
+                throw new InvalidOperationException("Cannot poll an unconfigured monitor.");
 
-//            //async
-//        }
+            try
+            {
+                // Only one polling task can be executing at a time
+                // If another polling task is started, just exit.
+                if(!System.Threading.Monitor.TryEnter(pollLock))
+                    return;
 
-//        public void Configure(IMonitorConfig config)
-//        {
-//            if(config == null)
-//                throw new ArgumentNullException("config");
-//            if(config.BaseUri == null)
-//                throw new InvalidOperationException("Configure must include a valid URI to poll.");
+                var node = await client.GetResourceAsync<Node>(BaseUri, TreeParameter);
 
-//            BaseUri = config.BaseUri;
-//        }
+                var tasks = node.Jobs.Select(UpdateJobAsync);
+                await TaskEx.WhenAll(tasks);
+            }
+            catch(Exception ex)
+            {
+                PollingError(this, new PollingErrorEventArgs(ex));
+            }
+            finally
+            {
+                System.Threading.Monitor.Exit(pollLock);
+            }
+        }
 
-//        #region Events
+        private async Task UpdateJobAsync(Job jobInfo)
+        {
+            Build lastSeenBuild;
+            lastSeenBuilds.TryGetValue(jobInfo.Url, out lastSeenBuild);
 
-        
-//        // Events I care about:
-//        // * Polling error
-//        // * New job
-//        // * Build started
-//        // * Build finished
-//        // *   Previous State
-//        // *   Latest state
+            if(lastSeenBuild == null)
+            {
+                var state = await GetJobState(jobInfo, "");
+                FoundJob(this, new JobFoundEventArgs(state.Job));
+                return;
+            }
+            
+            if(lastSeenBuild.Number != jobInfo.LastBuild.Number || lastSeenBuild.Building != jobInfo.LastBuild.Building)
+            {
+                var state = await GetJobState(jobInfo, lastSeenBuild.Result);
+                if(state.CurrentBuild.Building)
+                    BuildStarted(this, new BuildEventArgs(state.Job, state.CurrentBuild));
+                else
+                    OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
+            }
+        }
 
-//        public event EventHandler<PollingErrorEventArgs> PollingError;
-//        protected virtual void OnPollingError(PollingErrorEventArgs e)
-//        {
-//            eventContext.Post(state => {
-//                var handlers = PollingError;
-//                if (handlers != null)
-//                    handlers(this, e);
-//            }, null);
-//        }
+        private void OnBuildFinished(JobBuildTuple buildTuple, bool isStatusChange)
+        {
+            var e = new BuildEventArgs(buildTuple.Job, buildTuple.CurrentBuild, isStatusChange);
+            BuildFinished(this, e);
+            switch(buildTuple.CurrentBuild.Result.ToUpperInvariant())
+            {
+                case "SUCCESS":
+                    BuildSucceeded(this, e);
+                    break;
+                case "FAILURE":
+                    BuildFailed(this, e);
+                    break;
+                case "ABORTED":
+                    BuildAborted(this, e);
+                    break;
+                case "UNSTABLE":
+                    BuildUnstable(this, e);
+                    break;
+            }
+        }
 
-//        public event EventHandler<JobEventArgs> FoundJob;
-//        protected virtual void OnFoundJob(JobEventArgs e)
-//        {
-//            eventContext.Post(state => {
-//                var handlers = FoundJob;
-//                if (handlers != null)
-//                    handlers(this, e);
-//            }, null);
-//        }
- 
+        private async Task<JobBuildTuple> GetJobState(Job job, string previousResult)
+        {
+            job = await client.ExpandAsync(job);
+            var currentBuild = job.LastBuild == null
+                ? new Build {Building = false, Number = 0, Result = ""}
+                : await client.ExpandAsync(job.LastBuild);
+            currentBuild.Result = currentBuild.Result ?? previousResult;
+            lastSeenBuilds[job.Url] = currentBuild;
+            
+            return new JobBuildTuple {
+                Job = job,
+                CurrentBuild = currentBuild,
+            };
+        }
 
-//        #endregion
-
-//        private static string CreateBuildTree(string buildId)
-//        {
-//            return buildId + "[number,url]";
-//        }
-
-//        private static string CreateJobTree()
-//        {
-//            return "jobs[name,displayName,url,color]";
-//            // + CreateBuildTree("lastBuild") + "]";
-//            //+ CreateBuildTree("lastCompletedBuild")
-//            //+ CreateBuildTree("lastFailedBuild")
-//            //+ CreateBuildTree("lastStableBuild")
-//            //+ CreateBuildTree("lastSuccessfulBuild")
-//            //+ CreateBuildTree("lastUnstableBuild")
-//            //+ CreateBuildTree("lastUnsuccessfulBuild");
-//        }
-
-//        private static readonly string TreeParameter = CreateJobTree();
-        
-//        private Task StartTask(Action action, bool isLongRunning = false)
-//        {
-//            var creationOptions = isLongRunning ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
-//            var task = new Task(action, creationOptions);
-//            task.Start(scheduler);
-//            return task;
-//        }
-
-//        /// <summary>
-//        /// Polls the monitored node, and fires events based on changes in job state.
-//        /// </summary>
-//        public Task Poll()
-//        {
-//            if(BaseUri == null)
-//                throw new InvalidOperationException("Cannot poll an unconfigured monitor.");
-
-//            return StartTask(PollTask, true);
-//        }
-
-//        private void PollTask()
-//        {
-//            try
-//            {
-//                // Only one polling task can be executing at a time
-//                // If another polling task is started, just exit.
-//                if(!System.Threading.Monitor.TryEnter(pollLock))
-//                    return;
-                
-//                var node = client.GetResourceAsync<Node>(BaseUri, TreeParameter);
-
-//                foreach(var job in node.Jobs)
-//                    UpdateJob(job);
-//            }
-//            catch (ClientException ex)
-//            {
-//                OnPollingError(new PollingErrorEventArgs(ex));
-//            }
-//            finally
-//            {
-//                System.Threading.Monitor.Exit(pollLock);
-//            }
-//        }
-
-//        private void UpdateJob(Job job)
-//        {
-//            var previousState = store.Load(job.Url);
-//            var currentState = JobState.CreateFromJob(job);
-
-//            if(previousState == null)
-//            {
-//                job = client.ExpandAsync(job);
-//                OnFoundJob(new JobEventArgs(job));
-//                store.Store(currentState);
-//                return;
-//            }
-
-//            store.Store(currentState);
-//        }
-//    }
-//}
+        private struct JobBuildTuple
+        {
+            public Job Job { get; set; }
+            public Build CurrentBuild { get; set; }
+        }
+    }
+}

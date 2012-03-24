@@ -84,8 +84,10 @@ namespace Niles.Client
         /// </param>
         /// <returns>A task that will return resource, deserialized from JSON.</returns>
         public async Task<T> ExpandAsync<T>(T resource, string tree = null)
-            where T : IResource
+            where T : class, IResource
         {
+            if(resource == null)
+                return null;
             return await GetResourceAsync<T>(resource.Url, tree);
         }
 
@@ -103,8 +105,10 @@ namespace Niles.Client
         /// </param>
         /// <returns>A task that will return resource, deserialized from JSON.</returns>
         public async Task<T> ExpandAsync<T>(T resource, int depth)
-            where T : IResource
+            where T : class, IResource
         {
+            if(resource == null)
+                return null;
             return await GetResourceAsync<T>(resource.Url, depth);
         }
 

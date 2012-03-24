@@ -27,9 +27,9 @@ namespace Niles.Client
         Task<T> GetResourceAsync<T>(Uri resourceUri, int depth);
 
         Task<T> ExpandAsync<T>(T resource, string tree = null)
-            where T : IResource;
+            where T : class, IResource;
 
         Task<T> ExpandAsync<T>(T resource, int depth)
-            where T : IResource;
+            where T : class, IResource;
     }
 }

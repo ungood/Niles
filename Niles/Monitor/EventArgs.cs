@@ -23,22 +23,35 @@ namespace Niles.Monitor
 {
     public class PollingErrorEventArgs : EventArgs
     {
-        public ClientException Exception { get; private set; }
+        public Exception Exception { get; private set; }
 
-        public PollingErrorEventArgs(ClientException exception)
+        public PollingErrorEventArgs(Exception exception)
         {
             Exception = exception;
         }
     }
 
-    public class JobEventArgs : EventArgs
+    public class JobFoundEventArgs : EventArgs
     {
         public Job Job { get; private set; }
-        public JobState JobState { get; private set; }
-
-        public JobEventArgs(Job job)
+        
+        public JobFoundEventArgs(Job job)
         {
             Job = job;
+        }
+    }
+
+    public class BuildEventArgs : EventArgs
+    {
+        public Job Job { get; private set; }
+        public Build Build { get; private set; }
+        public bool StatusChanged { get; private set; }
+
+        public BuildEventArgs(Job job, Build build, bool isFirstTime = false)
+        {
+            Build = build;
+            Job = job;
+            StatusChanged = isFirstTime;
         }
     }
 }
