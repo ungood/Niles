@@ -16,14 +16,8 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
-using Niles;
-using Niles.Model;
 using Niles.Monitor;
-using Nito.AsyncEx;
 
 namespace SampleConsoleApp
 {
@@ -45,14 +39,11 @@ namespace SampleConsoleApp
             monitor.FoundJob += HandleFoundJob;
 
             
-            AsyncContext.Run(async () => {
-                while(true)
-                {
-                    await monitor.PollAsync();
-                    Thread.Sleep(10000);
-                }
-            });
-
+           while(true)
+           {
+               monitor.Poll();
+               Thread.Sleep(10000);
+           }
         }
 
         private static void Log(string eventName, BuildEventArgs e)

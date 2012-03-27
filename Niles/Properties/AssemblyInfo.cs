@@ -39,5 +39,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("97d067aa-efd3-475d-992e-efc32ed97e83")]
 
 // Leave this as 1.0.0.0 for AssemblyInfoTask to do its job.
-[assembly: AssemblyVersion("1.0.1203.07")]
-[assembly: AssemblyFileVersion("1.0.1203.07")]
+[assembly: AssemblyVersion("1.0.1203.19")]
+[assembly: AssemblyFileVersion("1.0.1203.19")]

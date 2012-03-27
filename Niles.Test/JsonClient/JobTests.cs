@@ -18,7 +18,6 @@
 using System;
 using NUnit.Framework;
 using Niles.Model;
-using Nito.AsyncEx;
 
 namespace Niles.Test.JsonClient
 {
@@ -28,30 +27,26 @@ namespace Niles.Test.JsonClient
         [Test]
         public void Can_Get_Valid_Job_Resource()
         {
-            AsyncContext.Run(async () => {
-                Expect("ValidJob.json", "ValidJob");
-                var job = await Client.GetResourceAsync<Job>(new Uri("mock://test/ValidJob/"));
-                AssertJobIsCorrect(job);
-            });
+            Expect("ValidJob.json", "ValidJob");
+            var job = Client.GetResource<Job>(new Uri("mock://test/ValidJob/"));
+            AssertJobIsCorrect(job);
         }
 
         [Test]
         public void Can_Expand_Valid_Job_Resource()
         {
-            AsyncContext.Run(async () => {
-                Expect("ValidJob.json", "ValidJob");
-                var job = new Job {
-                    Name = "alfred.automation",
-                    Url = new Uri("mock://test/ValidJob/"),
-                    Color = "red"
-                };
+            Expect("ValidJob.json", "ValidJob");
+            var job = new Job {
+                Name = "alfred.automation",
+                Url = new Uri("mock://test/ValidJob/"),
+                Color = "red"
+            };
 
-                job = await Client.ExpandAsync(job);
-                AssertJobIsCorrect(job);
-            });
+            job = Client.Expand(job);
+            AssertJobIsCorrect(job);
         }
 
-        private void AssertJobIsCorrect(Job job)
+        public static void AssertJobIsCorrect(Job job)
         {
             Assert.IsNotNull(job);
             Assert.AreEqual("Build the Alfred application in the automation environment. ", job.Description);
@@ -89,17 +84,15 @@ namespace Niles.Test.JsonClient
         [Test]
         public void Can_Get_Job_Resource_With_Tree()
         {
-            AsyncContext.Run(async () => {
-                Expect("ValidJobTree.json", "ValidJob", "?tree=name,color,builds[number,timestamp]");
-                var job = await Client.GetResourceAsync<Job>(new Uri("mock://test/ValidJob/"), "name,color,builds[number,timestamp]");
+            Expect("ValidJobTree.json", "ValidJob", "?tree=name,color,builds[number,timestamp]");
+            var job = Client.GetResource<Job>(new Uri("mock://test/ValidJob/"), "name,color,builds[number,timestamp]");
 
-                Assert.IsNotNull(job);
-                Assert.AreEqual("alfred.automation", job.Name);
-                Assert.AreEqual(4, job.Builds.Count);
-                Assert.AreEqual(new DateTime(2011, 11, 29, 06, 03, 01, 433, DateTimeKind.Utc), job.Builds[3].Timestamp);
-                Assert.AreEqual(29, job.Builds[0].Number);
-                Assert.AreEqual("red", job.Color);
-            });
+            Assert.IsNotNull(job);
+            Assert.AreEqual("alfred.automation", job.Name);
+            Assert.AreEqual(4, job.Builds.Count);
+            Assert.AreEqual(new DateTime(2011, 11, 29, 06, 03, 01, 433, DateTimeKind.Utc), job.Builds[3].Timestamp);
+            Assert.AreEqual(29, job.Builds[0].Number);
+            Assert.AreEqual("red", job.Color);
         }
     }
 }

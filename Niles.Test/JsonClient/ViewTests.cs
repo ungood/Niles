@@ -18,7 +18,6 @@
 using System;
 using NUnit.Framework;
 using Niles.Model;
-using Nito.AsyncEx;
 
 namespace Niles.Test.JsonClient
 {
@@ -28,19 +27,17 @@ namespace Niles.Test.JsonClient
         [Test]
         public void Can_Get_Valid_View_Resource()
         {
-            AsyncContext.Run(async () => {
-                Expect("ValidView.json", "ValidView");
-                var view = await Client.GetResourceAsync<View>(new Uri("mock://test/ValidView/"));
+            Expect("ValidView.json", "ValidView");
+            var view = Client.GetResource<View>(new Uri("mock://test/ValidView/"));
 
-                Assert.IsNotNull(view);
-                Assert.AreEqual("operations", view.Name);
-                Assert.AreEqual(new Uri("mock://test:8080/view/operations/"), view.Url);
-                Assert.AreEqual("Operations make things operate.", view.Description);
-                Assert.AreEqual(3, view.Jobs.Count);
-                Assert.AreEqual("blue", view.Jobs[0].Color);
-                Assert.AreEqual(new Uri("mock://test:8080/job/operations.alfred.deploy/"), view.Jobs[1].Url);
-                Assert.AreEqual("operations.alfred.qa", view.Jobs[2].Name);
-            });
+            Assert.IsNotNull(view);
+            Assert.AreEqual("operations", view.Name);
+            Assert.AreEqual(new Uri("mock://test:8080/view/operations/"), view.Url);
+            Assert.AreEqual("Operations make things operate.", view.Description);
+            Assert.AreEqual(3, view.Jobs.Count);
+            Assert.AreEqual("blue", view.Jobs[0].Color);
+            Assert.AreEqual(new Uri("mock://test:8080/job/operations.alfred.deploy/"), view.Jobs[1].Url);
+            Assert.AreEqual("operations.alfred.qa", view.Jobs[2].Name);
         }
     }
 }

@@ -40,12 +40,35 @@ namespace Niles.Client
             get { return "api/json"; }
         }
 
-        protected async override Task<T> GetResourceInternal<T>(Uri absoluteUri)
+        protected async override Task<T> GetResourceInternalAsync<T>(Uri absoluteUri)
         {
             var request = WebRequest.Create(absoluteUri);
             try
             {
                 var response = await request.GetResponseAsync();
+                
+                using(var responseStream = response.GetResponseStream())
+                {
+                   return serializer.ReadObject<T>(responseStream);
+                }
+                
+            }
+            catch (WebException ex)
+            {
+                throw new ClientException("Could not access resource at: " + absoluteUri, ex);
+            }
+            catch (JsonReaderException ex)
+            {
+                throw new ClientException("Resource at " + absoluteUri + " is not valid JSON", ex);
+            }
+        }
+
+        protected override T GetResourceInternal<T>(Uri absoluteUri)
+        {
+            var request = WebRequest.Create(absoluteUri);
+            try
+            {
+                var response = request.GetResponse();
                 
                 using(var responseStream = response.GetResponseStream())
                 {

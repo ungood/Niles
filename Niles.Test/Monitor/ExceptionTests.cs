@@ -34,7 +34,7 @@ namespace Niles.Test.Monitor
         [Test]
         public void Exception_While_Retrieving_Node_Should_Raise_PollingError()
         {
-            MockClient.GetResourceAsync<Node>(null)
+            MockClient.GetResource<Node>(null)
                 .ThrowsForAnyArgs(new Exception("Error"));
             
             Monitor.Poll();

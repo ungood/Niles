@@ -24,13 +24,5 @@ namespace Niles.Json
                 return serializer.Deserialize<T>(jsonReader);
             }
         }
-
-        public void WriteObject<T>(Stream stream, T value)
-        {
-            using(var streamWriter = new StreamWriter(stream))
-            {
-                serializer.Serialize(streamWriter, value);
-            }
-        }
     }
 }

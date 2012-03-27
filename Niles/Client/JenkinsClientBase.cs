@@ -25,7 +25,8 @@ namespace Niles.Client
     public abstract class JenkinsClientBase : IJenkinsClient
     {
         protected abstract string ApiSuffix { get; }
-        protected abstract Task<T> GetResourceInternal<T>(Uri absoluteUri);
+        protected abstract Task<T> GetResourceInternalAsync<T>(Uri absoluteUri);
+        protected abstract T GetResourceInternal<T>(Uri absoluteUri);
 
         protected JenkinsClientBase()
         {
@@ -33,41 +34,29 @@ namespace Niles.Client
         }
 
         /// <summary>
-        /// Gets a jenkins resource given it's URI and optional tree parameter.
+        /// Retrieves a jenkins resource given it's URI and optional tree parameter.
         /// </summary>
-        /// <typeparam name="T">The type of resource to get.</typeparam>
         /// <param name="resourceUri">The absolute URI of that resource (not including the api suffix).</param>
         /// <param name="tree">
         /// A tree parameter, which will filter what properties are selected. See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>A task that will return resource, deserialized from JSON.</returns>
-        public async Task<T> GetResourceAsync<T>(Uri resourceUri, string tree = null)
+        public T GetResource<T>(Uri resourceUri, string tree = null)
         {
-            var relativeUri = ApiSuffix;
-            if(!string.IsNullOrWhiteSpace(tree))
-                relativeUri += "?tree=" + tree;
-
-            var absoluteUri = new Uri(resourceUri, relativeUri);
-            return await GetResourceInternal<T>(absoluteUri);
+            var absoluteUri = GetAbsoluteUri(resourceUri, tree);
+            return GetResourceInternal<T>(absoluteUri);
         }
 
         /// <summary>
-        /// Gets a jenkins resource given it's URI, recursing the given number of levels.
+        /// Retrieves a jenkins resource given it's URI and optional tree parameter.
         /// </summary>
-        /// <typeparam name="T">The type of resource to get.</typeparam>
         /// <param name="resourceUri">The absolute URI of that resource (not including the api suffix).</param>
         /// <param name="depth">
         /// The number of levels to select.  See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>A task that will return resource, deserialized from JSON.</returns>
-        public async Task<T> GetResourceAsync<T>(Uri resourceUri, int depth)
+        public T GetResource<T>(Uri resourceUri, int depth)
         {
-            var relativeUri = ApiSuffix;
-            if(depth > 0)
-                relativeUri += "?depth=" + depth;
-
-            var absoluteUri = new Uri(resourceUri, relativeUri);
-            return await GetResourceInternal<T>(absoluteUri);
+            var absoluteUri = GetAbsoluteUri(resourceUri, depth);
+            return GetResourceInternal<T>(absoluteUri);
         }
 
         /// <summary>
@@ -77,39 +66,117 @@ namespace Niles.Client
         /// It's important to notice this method returns a new instance of the resource, and doesn't
         /// change the passed in instance.
         /// </remarks>
-        /// <typeparam name="T">The type of resource to get.</typeparam>
         /// <param name="resource">A previously retrieved instance of this resource.</param>
         /// <param name="tree">
         /// A tree parameter, which will filter what properties are selected. See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>A task that will return resource, deserialized from JSON.</returns>
-        public async Task<T> ExpandAsync<T>(T resource, string tree = null)
-            where T : class, IResource
+        public T Expand<T>(T resource, string tree = null) where T : class, IResource
         {
             if(resource == null)
                 return null;
-            return await GetResourceAsync<T>(resource.Url, tree);
+            return GetResource<T>(resource.Url, tree);
         }
 
         /// <summary>
-        /// Expands a partially retrieved resource, recursing the given number of levels.
+        /// Expands a partially retrieved resource, with an optional tree parameter.
         /// </summary>
         /// <remarks>
         /// It's important to notice this method returns a new instance of the resource, and doesn't
         /// change the passed in instance.
         /// </remarks>
-        /// <typeparam name="T">The type of resource to get.</typeparam>
         /// <param name="resource">A previously retrieved instance of this resource.</param>
         /// <param name="depth">
         /// The number of levels to select.  See the Jenkins API documentation for details.
         /// </param>
-        /// <returns>A task that will return resource, deserialized from JSON.</returns>
-        public async Task<T> ExpandAsync<T>(T resource, int depth)
+        public T Expand<T>(T resource, int depth) where T : class, IResource
+        {
+            if(resource == null)
+                return null;
+            return GetResource<T>(resource.Url, depth);
+        }
+
+        /// <summary>
+        /// Asynchronously retrieves a jenkins resource given it's URI and optional tree parameter.
+        /// </summary>
+        /// <param name="resourceUri">The absolute URI of that resource (not including the api suffix).</param>
+        /// <param name="tree">
+        /// A tree parameter, which will filter what properties are selected. See the Jenkins API documentation for details.
+        /// </param>
+        public Task<T> GetResourceAsync<T>(Uri resourceUri, string tree = null)
+        {
+            var absoluteUri = GetAbsoluteUri(resourceUri, tree);
+            return GetResourceInternalAsync<T>(absoluteUri);
+        }
+
+        /// <summary>
+        /// Asynchronously retrieves a jenkins resource given it's URI and optional tree parameter.
+        /// </summary>
+        /// <param name="resourceUri">The absolute URI of that resource (not including the api suffix).</param>
+        /// <param name="depth">
+        /// The number of levels to select.  See the Jenkins API documentation for details.
+        /// </param>
+        public Task<T> GetResourceAsync<T>(Uri resourceUri, int depth)
+        {
+            var absoluteUri = GetAbsoluteUri(resourceUri, depth);
+            return GetResourceInternalAsync<T>(absoluteUri);
+        }
+
+        /// <summary>
+        /// Asynchronously expands a partially retrieved resource, with an optional tree parameter.
+        /// </summary>
+        /// <remarks>
+        /// It's important to notice this method returns a new instance of the resource, and doesn't
+        /// change the passed in instance.
+        /// </remarks>
+        /// <param name="resource">A previously retrieved instance of this resource.</param>
+        /// <param name="tree">
+        /// A tree parameter, which will filter what properties are selected. See the Jenkins API documentation for details.
+        /// </param>
+        public Task<T> ExpandAsync<T>(T resource, string tree = null)
             where T : class, IResource
         {
             if(resource == null)
                 return null;
-            return await GetResourceAsync<T>(resource.Url, depth);
+            return GetResourceAsync<T>(resource.Url, tree);
+        }
+
+        /// <summary>
+        /// Asynchronously expands a partially retrieved resource, with an optional tree parameter.
+        /// </summary>
+        /// <remarks>
+        /// It's important to notice this method returns a new instance of the resource, and doesn't
+        /// change the passed in instance.
+        /// </remarks>
+        /// <param name="resource">A previously retrieved instance of this resource.</param>
+        /// <param name="depth">
+        /// The number of levels to select.  See the Jenkins API documentation for details.
+        /// </param>
+        public Task<T> ExpandAsync<T>(T resource, int depth)
+            where T : class, IResource
+        {
+            if(resource == null)
+                return null;
+            return GetResourceAsync<T>(resource.Url, depth);
+        }
+
+        private Uri GetAbsoluteUri(Uri resourceUri, string tree)
+        {
+            var relativeUri = ApiSuffix;
+            if(!string.IsNullOrWhiteSpace(tree))
+                relativeUri += "?tree=" + tree;
+            
+            var absoluteUri = new Uri(resourceUri, relativeUri);
+            return absoluteUri;
+        }
+
+        private Uri GetAbsoluteUri(Uri resourceUri, int depth)
+        {
+            var relativeUri = ApiSuffix;
+            if(depth > 0)
+                relativeUri += "?depth=" + depth;
+
+            var absoluteUri = new Uri(resourceUri, relativeUri);
+            return absoluteUri;
         }
 
         /// <summary>

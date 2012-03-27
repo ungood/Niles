@@ -23,6 +23,15 @@ namespace Niles.Client
 {
     public interface IJenkinsClient
     {
+        T GetResource<T>(Uri resourceUri, string tree = null);
+        T GetResource<T>(Uri resourceUri, int depth);
+
+        T Expand<T>(T resource, string tree = null)
+            where T : class, IResource;
+
+        T Expand<T>(T resource, int depth)
+            where T : class, IResource;
+
         Task<T> GetResourceAsync<T>(Uri resourceUri, string tree = null);
         Task<T> GetResourceAsync<T>(Uri resourceUri, int depth);
 

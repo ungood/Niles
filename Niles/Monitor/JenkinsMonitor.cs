@@ -58,53 +58,54 @@ namespace Niles.Monitor
 
         public void Poll(int timeout = Timeout.Infinite)
         {
-            PollAsync().Wait(timeout);
-        }
+            var tasks = new Task[0];
 
-        /// <summary>
-        /// Polls the monitored node, and fires events based on changes in job state.
-        /// </summary>
-        public async Task PollAsync()
-        {
             try
             {
-                var node = await client.GetResourceAsync<Node>(BaseUri, TreeParameter);
-
-                var tasks = node.Jobs.Select(UpdateJobAsync);
-                await TaskEx.WhenAll(tasks);
+                var node = client.GetResource<Node>(BaseUri, TreeParameter);
+                tasks = node.Jobs.Select(UpdateJobAsync).ToArray();
             }
             catch(Exception ex)
             {
                 PollingError(this, new PollingErrorEventArgs(ex));
             }
+
+            Task.WaitAll(tasks);
         }
 
         private async Task UpdateJobAsync(Job jobInfo)
         {
-            Build lastSeenBuild;
-            lastSeenBuilds.TryGetValue(jobInfo.Url, out lastSeenBuild);
+            try
+            {
+                Build lastSeenBuild;
+                lastSeenBuilds.TryGetValue(jobInfo.Url, out lastSeenBuild);
 
-            if(lastSeenBuild == null)
-            {
-                var state = await GetJobState(jobInfo, "");
-                FoundJob(this, new JobFoundEventArgs(state.Job));
-                return;
-            }
-            
-            if(lastSeenBuild.Number != jobInfo.LastBuild.Number)
-            {
-                var state = await GetJobState(jobInfo, lastSeenBuild.Result);
-                BuildStarted(this, new BuildEventArgs(state.Job, state.CurrentBuild));
-                if(!state.Job.LastBuild.Building)
-                    OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
-                return;
-            }
+                if(lastSeenBuild == null)
+                {
+                    var state = await GetJobState(jobInfo, "");
+                    FoundJob(this, new JobFoundEventArgs(state.Job));
+                    return;
+                }
 
-            if(lastSeenBuild.Building != jobInfo.LastBuild.Building)
+                if(lastSeenBuild.Number != jobInfo.LastBuild.Number)
+                {
+                    var state = await GetJobState(jobInfo, lastSeenBuild.Result);
+                    BuildStarted(this, new BuildEventArgs(state.Job, state.CurrentBuild));
+                    if(!state.Job.LastBuild.Building)
+                        OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
+                    return;
+                }
+
+                if(lastSeenBuild.Building != jobInfo.LastBuild.Building)
+                {
+                    var state = await GetJobState(jobInfo, lastSeenBuild.Result);
+                    if(!state.Job.LastBuild.Building)
+                        OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
+                }
+            }
+            catch(Exception ex)
             {
-                var state = await GetJobState(jobInfo, lastSeenBuild.Result);
-                if(!state.Job.LastBuild.Building)
-                    OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
+                PollingError(this, new PollingErrorEventArgs(ex));
             }
         }
 

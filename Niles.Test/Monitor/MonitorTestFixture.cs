@@ -66,8 +66,8 @@ namespace Niles.Test.Monitor
 
         protected void SetupMockResource<T>(T result)
         {
-            MockClient.GetResourceAsync<T>(null)
-                .ReturnsForAnyArgsAsync(result);
+            MockClient.GetResource<T>(null)
+                .ReturnsForAnyArgs(result);
         }
 
         protected void SetupMockExpand<T>(T objectToExpand)

@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
 
 namespace Niles.Test.MockWebRequest
 {
@@ -46,12 +45,14 @@ namespace Niles.Test.MockWebRequest
 
         public override IAsyncResult BeginGetResponse(AsyncCallback callback, object state)
         {
-            return AsyncFactory<WebResponse>.ToBegin(GetResponseTask(), callback, state);
+            return GetResponseTask();
         }
 
         public override WebResponse EndGetResponse(IAsyncResult asyncResult)
         {
-            return AsyncFactory<WebResponse>.ToEnd(asyncResult);
+            var task = (Task<WebResponse>)asyncResult;
+            task.Wait();
+            return task.Result;
         }
     }
 }

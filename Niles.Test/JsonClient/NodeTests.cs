@@ -16,12 +16,9 @@
 #endregion
 
 using System;
-using System.Net;
 using NUnit.Framework;
-using Newtonsoft.Json;
 using Niles.Client;
 using Niles.Model;
-using Nito.AsyncEx;
 
 namespace Niles.Test.JsonClient
 {
@@ -31,75 +28,47 @@ namespace Niles.Test.JsonClient
         [Test]
         public void Can_Get_Valid_Node_Resource()
         {
-            AsyncContext.Run(async () => {
-                Expect("ValidNode.json", "ValidNode");
-                var uri = new Uri("mock://test/ValidNode/");
-                var node = await Client.GetResourceAsync<Node>(uri);
+        Expect("ValidNode.json", "ValidNode");
+            var uri = new Uri("mock://test/ValidNode/");
+            var node = Client.GetResource<Node>(uri);
 
-                Assert.IsNotNull(node);
-                Assert.AreEqual("NORMAL", node.Mode);
-                Assert.AreEqual("the master Jenkins node", node.NodeDescription);
-                Assert.AreEqual(6, node.NumExecutors);
-                Assert.AreEqual("Example Build System", node.Description);
+            Assert.IsNotNull(node);
+            Assert.AreEqual("NORMAL", node.Mode);
+            Assert.AreEqual("the master Jenkins node", node.NodeDescription);
+            Assert.AreEqual(6, node.NumExecutors);
+            Assert.AreEqual("Example Build System", node.Description);
 
-                Assert.AreEqual(5, node.Jobs.Count);
-                Assert.AreEqual("blue", node.Jobs[3].Color);
-                Assert.AreEqual("alfred.automation", node.Jobs[0].Name);
-                Assert.AreEqual(new Uri("mock://test:8080/job/alfred.binarypromotion.branch/"), node.Jobs[1].Url);
+            Assert.AreEqual(5, node.Jobs.Count);
+            Assert.AreEqual("blue", node.Jobs[3].Color);
+            Assert.AreEqual("alfred.automation", node.Jobs[0].Name);
+            Assert.AreEqual(new Uri("mock://test:8080/job/alfred.binarypromotion.branch/"), node.Jobs[1].Url);
 
-                Assert.AreEqual("All", node.PrimaryView.Name);
-                Assert.AreEqual(new Uri("mock://test:8080/"), node.PrimaryView.Url);
+            Assert.AreEqual("All", node.PrimaryView.Name);
+            Assert.AreEqual(new Uri("mock://test:8080/"), node.PrimaryView.Url);
 
-                Assert.AreEqual(false, node.QuietingDown);
-                Assert.AreEqual(0, node.SlaveAgentPort);
-                Assert.AreEqual(false, node.UseCrumbs);
-                Assert.AreEqual(true, node.UseSecurity);
+            Assert.AreEqual(false, node.QuietingDown);
+            Assert.AreEqual(0, node.SlaveAgentPort);
+            Assert.AreEqual(false, node.UseCrumbs);
+            Assert.AreEqual(true, node.UseSecurity);
 
-                Assert.AreEqual(3, node.Views.Count);
-                Assert.AreEqual("badabing", node.Views[1].Name);
-                Assert.AreEqual(new Uri("mock://test:8080/view/operations/"), node.Views[2].Url);
-            });
+            Assert.AreEqual(3, node.Views.Count);
+            Assert.AreEqual("badabing", node.Views[1].Name);
+            Assert.AreEqual(new Uri("mock://test:8080/view/operations/"), node.Views[2].Url);
         }
 
         [Test]
         public void Throws_JenkinsClientException_When_Accessing_NonExistingResource()
         {
-            try
-            {
-                AsyncContext.Run(async () => {
-                    await Client.GetResourceAsync<Node>(new Uri("mock://doesnotexist/"));
-                });
-                Assert.Fail();
-            }
-            catch(ClientException ex)
-            {
-                Assert.AreEqual(typeof (WebException), ex.InnerException.GetType());
-            }
-            catch
-            {
-                Assert.Fail();
-            }
+            var resourceUri = new Uri("mock://doesnotexist/");
+            Assert.Throws<ClientException>(() => Client.GetResource<Node>(resourceUri));
         }
 
         [Test]
         public void Throws_JenkinsClientException_When_Accessing_InvalidResource()
         {
+            var resourceUri = new Uri("mock://test/InvalidNode/");
             Expect("InvalidNode.json", "InvalidNode");
-            try
-            {
-                AsyncContext.Run(async () => {
-                    await Client.GetResourceAsync<Node>(new Uri("mock://test/InvalidNode/"));
-                });
-                Assert.Fail();
-            }
-            catch(ClientException ex)
-            {
-                Assert.AreEqual(typeof (JsonReaderException), ex.InnerException.GetType());
-            }
-            catch
-            {
-                Assert.Fail();
-            }
+            Assert.Throws<ClientException>(() => Client.GetResource<Node>(resourceUri));
         }
     }
 }
