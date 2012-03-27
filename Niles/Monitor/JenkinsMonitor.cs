@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Niles.Client;
 using Niles.Model;
@@ -32,8 +33,6 @@ namespace Niles.Monitor
         private readonly ConcurrentDictionary<Uri, Build> lastSeenBuilds
             = new ConcurrentDictionary<Uri, Build>();
         private readonly IJenkinsClient client;
-
-        private readonly object pollLock = new object();
 
         public Uri BaseUri { get; private set; }
 
@@ -57,21 +56,18 @@ namespace Niles.Monitor
         
         private const string TreeParameter = "jobs[name,displayName,url,lastBuild[url,number,building,result]]";
 
+        public void Poll(int timeout = Timeout.Infinite)
+        {
+            PollAsync().Wait(timeout);
+        }
+
         /// <summary>
         /// Polls the monitored node, and fires events based on changes in job state.
         /// </summary>
         public async Task PollAsync()
         {
-            if(BaseUri == null)
-                throw new InvalidOperationException("Cannot poll an unconfigured monitor.");
-
             try
             {
-                // Only one polling task can be executing at a time
-                // If another polling task is started, just exit.
-                if(!System.Threading.Monitor.TryEnter(pollLock))
-                    return;
-
                 var node = await client.GetResourceAsync<Node>(BaseUri, TreeParameter);
 
                 var tasks = node.Jobs.Select(UpdateJobAsync);
@@ -80,10 +76,6 @@ namespace Niles.Monitor
             catch(Exception ex)
             {
                 PollingError(this, new PollingErrorEventArgs(ex));
-            }
-            finally
-            {
-                System.Threading.Monitor.Exit(pollLock);
             }
         }
 
@@ -99,12 +91,19 @@ namespace Niles.Monitor
                 return;
             }
             
-            if(lastSeenBuild.Number != jobInfo.LastBuild.Number || lastSeenBuild.Building != jobInfo.LastBuild.Building)
+            if(lastSeenBuild.Number != jobInfo.LastBuild.Number)
             {
                 var state = await GetJobState(jobInfo, lastSeenBuild.Result);
-                if(state.CurrentBuild.Building)
-                    BuildStarted(this, new BuildEventArgs(state.Job, state.CurrentBuild));
-                else
+                BuildStarted(this, new BuildEventArgs(state.Job, state.CurrentBuild));
+                if(!state.Job.LastBuild.Building)
+                    OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
+                return;
+            }
+
+            if(lastSeenBuild.Building != jobInfo.LastBuild.Building)
+            {
+                var state = await GetJobState(jobInfo, lastSeenBuild.Result);
+                if(!state.Job.LastBuild.Building)
                     OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
             }
         }

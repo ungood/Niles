@@ -13,7 +13,7 @@
     <ToolsDir>$(SolutionDir)\Tools</ToolsDir>
     <MSBuildExtensions>$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.dll</MSBuildExtensions>
     <AssemblyInfoTask>$(MSBuildExtensionsPath)\Microsoft\AssemblyInfoTask\Microsoft.VersionNumber.targets</AssemblyInfoTask>
-    <NugetPath>$(ToolsDir)\nuget.exe</NugetPath>
+    <NugetPath>.nuget\nuget.exe</NugetPath>
     <NUnitPath>$(ToolsDir)\NUnit-2.5.10.11092\bin\net-2.0</NUnitPath>
   </PropertyGroup>
 
