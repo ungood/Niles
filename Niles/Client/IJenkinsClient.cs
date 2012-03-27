@@ -16,7 +16,6 @@
 #endregion
 
 using System;
-using System.Threading.Tasks;
 using Niles.Model;
 
 namespace Niles.Client
@@ -30,15 +29,6 @@ namespace Niles.Client
             where T : class, IResource;
 
         T Expand<T>(T resource, int depth)
-            where T : class, IResource;
-
-        Task<T> GetResourceAsync<T>(Uri resourceUri, string tree = null);
-        Task<T> GetResourceAsync<T>(Uri resourceUri, int depth);
-
-        Task<T> ExpandAsync<T>(T resource, string tree = null)
-            where T : class, IResource;
-
-        Task<T> ExpandAsync<T>(T resource, int depth)
             where T : class, IResource;
     }
 }

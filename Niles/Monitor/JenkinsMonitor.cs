@@ -73,7 +73,12 @@ namespace Niles.Monitor
             Task.WaitAll(tasks);
         }
 
-        private async Task UpdateJobAsync(Job jobInfo)
+        private Task UpdateJobAsync(Job jobInfo)
+        {
+            return Task.Factory.StartNew(() => UpdateJob(jobInfo));
+        }
+
+        private void UpdateJob(Job jobInfo)
         {
             try
             {
@@ -82,14 +87,14 @@ namespace Niles.Monitor
 
                 if(lastSeenBuild == null)
                 {
-                    var state = await GetJobState(jobInfo, "");
+                    var state = GetJobState(jobInfo, "");
                     FoundJob(this, new JobFoundEventArgs(state.Job));
                     return;
                 }
 
                 if(lastSeenBuild.Number != jobInfo.LastBuild.Number)
                 {
-                    var state = await GetJobState(jobInfo, lastSeenBuild.Result);
+                    var state = GetJobState(jobInfo, lastSeenBuild.Result);
                     BuildStarted(this, new BuildEventArgs(state.Job, state.CurrentBuild));
                     if(!state.Job.LastBuild.Building)
                         OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
@@ -98,7 +103,7 @@ namespace Niles.Monitor
 
                 if(lastSeenBuild.Building != jobInfo.LastBuild.Building)
                 {
-                    var state = await GetJobState(jobInfo, lastSeenBuild.Result);
+                    var state = GetJobState(jobInfo, lastSeenBuild.Result);
                     if(!state.Job.LastBuild.Building)
                         OnBuildFinished(state, state.CurrentBuild.Result != lastSeenBuild.Result);
                 }
@@ -130,12 +135,12 @@ namespace Niles.Monitor
             }
         }
 
-        private async Task<JobBuildTuple> GetJobState(Job job, string previousResult)
+        private JobBuildTuple GetJobState(Job job, string previousResult)
         {
-            job = await client.ExpandAsync(job);
+            job = client.Expand(job);
             var currentBuild = job.LastBuild == null
                 ? new Build {Building = false, Number = 0, Result = ""}
-                : await client.ExpandAsync(job.LastBuild);
+                : client.Expand(job.LastBuild);
             currentBuild.Result = currentBuild.Result ?? previousResult;
             lastSeenBuilds[job.Url] = currentBuild;
             

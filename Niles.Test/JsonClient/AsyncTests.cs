@@ -25,28 +25,28 @@ namespace Niles.Test.JsonClient
     [TestFixture]
     public class AsyncTests : JsonClientFixture
     {
-        [Test]
-        public void Can_Get_Valid_Job_Resource_Async()
-        {
-            Expect("ValidJob.json", "ValidJob");
-            var task = Client.GetResourceAsync<Job>(new Uri("mock://test/ValidJob/"));
-            task.ContinueWith(t => JobTests.AssertJobIsCorrect(t.Result),
-                TaskContinuationOptions.ExecuteSynchronously);
-        }
+        //[Test]
+        //public void Can_Get_Valid_Job_Resource_Async()
+        //{
+        //    Expect("ValidJob.json", "ValidJob");
+        //    var task = Client.GetResourceAsync<Job>(new Uri("mock://test/ValidJob/"));
+        //    task.ContinueWith(t => JobTests.AssertJobIsCorrect(t.Result),
+        //        TaskContinuationOptions.ExecuteSynchronously);
+        //}
 
-        [Test]
-        public void Can_Expand_Valid_Job_Resource_Async()
-        {
-            Expect("ValidJob.json", "ValidJob");
-            var job = new Job {
-                Name = "alfred.automation",
-                Url = new Uri("mock://test/ValidJob/"),
-                Color = "red"
-            };
+        //[Test]
+        //public void Can_Expand_Valid_Job_Resource_Async()
+        //{
+        //    Expect("ValidJob.json", "ValidJob");
+        //    var job = new Job {
+        //        Name = "alfred.automation",
+        //        Url = new Uri("mock://test/ValidJob/"),
+        //        Color = "red"
+        //    };
 
-            var task = Client.ExpandAsync(job);
-            task.ContinueWith(t => JobTests.AssertJobIsCorrect(t.Result),
-                TaskContinuationOptions.ExecuteSynchronously);
-        }
+        //    var task = Client.ExpandAsync(job);
+        //    task.ContinueWith(t => JobTests.AssertJobIsCorrect(t.Result),
+        //        TaskContinuationOptions.ExecuteSynchronously);
+        //}
     }
 }

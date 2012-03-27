@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Niles")]
-[assembly: AssemblyCopyright("Copyright 2011 Jason Walker")]
+[assembly: AssemblyCopyright("Copyright 2012 Jason Walker")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -38,6 +38,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("97d067aa-efd3-475d-992e-efc32ed97e83")]
 
-// Leave this as 1.0.0.0 for AssemblyInfoTask to do its job.
-[assembly: AssemblyVersion("1.0.1203.19")]
-[assembly: AssemblyFileVersion("1.0.1203.19")]
+[assembly: AssemblyVersion("1.1.0.014")]
+[assembly: AssemblyFileVersion("1.1.0.014")]

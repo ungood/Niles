@@ -73,8 +73,8 @@ namespace Niles.Test.Monitor
         protected void SetupMockExpand<T>(T objectToExpand)
             where T : class, IResource
         {
-            MockClient.ExpandAsync(objectToExpand)
-                .ReturnsAsync(objectToExpand);
+            MockClient.Expand(objectToExpand)
+                .Returns(objectToExpand);
         }
 
         protected void AssertEventsFired(params string[] expected)

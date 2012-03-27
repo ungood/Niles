@@ -52,7 +52,7 @@ namespace Niles.Test.Monitor
 
             SetupMockNode(mockJob);
 
-            MockClient.ExpandAsync(mockJob)
+            MockClient.Expand(mockJob)
                 .Throws(new Exception("Error"));
 
             Monitor.Poll();
@@ -72,7 +72,7 @@ namespace Niles.Test.Monitor
             
             SetupMockExpand(mockJob);
 
-            MockClient.ExpandAsync(mockJob.LastBuild)
+            MockClient.Expand(mockJob.LastBuild)
                 .Throws(new Exception("Error"));
 
             Monitor.Poll();
