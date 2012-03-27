@@ -2,6 +2,7 @@
 bin
 obj
 Build
+packages
 
 # mstest test results
 TestResults## Ignore Visual Studio temporary files, build results, and
